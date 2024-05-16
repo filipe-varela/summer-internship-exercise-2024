@@ -161,6 +161,33 @@ public class TeknonymyServiceTest {
   }
 
   @Test
+  public void BigTreeTest() {
+    Person person = new Person(
+        "John",
+        'F',
+        new Person[] {
+            new Person("Holy", 'F', new Person[] {
+                new Person("William", 'M', null, LocalDateTime.of(1066, 1, 1, 0, 0)),
+                new Person("Vanessa", 'F', new Person[] {
+                    new Person("Mark", 'M', null, LocalDateTime.of(1071, 1, 1, 0, 0)),
+                    new Person("Susan", 'F', null, LocalDateTime.of(1082, 1, 1, 0, 0)),
+                    new Person("Kristin", 'F', new Person[] {
+                        new Person("Keith", 'M', null, LocalDateTime.of(1085, 1, 1, 0, 0))
+                    }, LocalDateTime.of(1075, 1, 1, 0, 0)),
+                }, LocalDateTime.of(1068, 1, 1, 0, 0))
+            }, LocalDateTime.of(1046, 1, 1, 0, 0)),
+            new Person("Baxter", 'M', null, LocalDateTime.of(1044, 1, 1, 0, 0)),
+            new Person("Rebeca", 'F', new Person[] {
+                new Person("Valister", 'F', null, LocalDateTime.of(1080, 1, 1, 0, 0))
+            }, LocalDateTime.of(1070, 1, 1, 0, 0))
+        },
+        LocalDateTime.of(1044, 1, 1, 0, 0));
+    String result = new TeknonymyService().getTeknonymy(person);
+    String expected = "great-great-grandmother of Keith";
+    assertEquals(result, expected);
+  }
+
+  @Test
   public void DummyATest() {
     Person person = new Person(
         "A",
@@ -371,13 +398,18 @@ public class TeknonymyServiceTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void ZeroLevelTest() {
+  public void ZeroGenerationTest() {
     new TeknonymyService().getRelativeTeknonymy('M', 0);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void NegativeLevelTest() {
+  public void NegativeGenerationTest() {
     new TeknonymyService().getRelativeTeknonymy('M', -1);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void UnvalidSexTest() {
+    new TeknonymyService().getRelativeTeknonymy('A', 0);
   }
 
 }
