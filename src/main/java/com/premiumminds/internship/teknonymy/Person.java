@@ -38,7 +38,7 @@ public record Person(
         return this.dateOfBirth.isBefore(test.dateOfBirth());
     }
 
-    public boolean sameGenerationAs(Person test) {
+    public boolean isSameGenerationAs(Person test) {
         return test.level() == this.level;
     }
 

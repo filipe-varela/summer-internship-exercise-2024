@@ -44,21 +44,16 @@ class TeknonymyService implements ITeknonymyService {
 
     personQueue.get(0).incrementChildrenLevel();
 
-    Person recentOldestPerson = new Person(personQueue.get(0));
+    Person teknonymyPerson = new Person(personQueue.get(0));
     Person currentPerson = new Person(personQueue.get(0));
 
     while (!personQueue.isEmpty()) {
       currentPerson = personQueue.remove(0);
 
       // validate oldest and recent children
-      if (!currentPerson.equals(recentOldestPerson)) {
-        if (currentPerson.isMoreRecentThan(recentOldestPerson)) {
-          recentOldestPerson = new Person(currentPerson);
-        } else if (currentPerson.sameGenerationAs(recentOldestPerson)) {
-          if (currentPerson.isOlderThan(recentOldestPerson)) {
-            recentOldestPerson = new Person(currentPerson);
-          }
-        }
+      if (!currentPerson.equals(teknonymyPerson) &&
+          doesUpdateTeknonymyPerson(teknonymyPerson, currentPerson)) {
+        teknonymyPerson = new Person(currentPerson);
       }
 
       if (!currentPerson.hasChildren())
@@ -71,12 +66,18 @@ class TeknonymyService implements ITeknonymyService {
         }
 
         // Add to queue since it has children
-        personQueue.add(0, new Person(person));
+        personQueue.add(0, person);
       }
     }
 
-    return recentOldestPerson;
+    return teknonymyPerson;
 
+  }
+
+  private boolean doesUpdateTeknonymyPerson(Person teknonymyPerson, Person currentPerson) {
+    boolean isOlderSameGeneration = currentPerson.isSameGenerationAs(teknonymyPerson)
+        && currentPerson.isOlderThan(teknonymyPerson);
+    return currentPerson.isMoreRecentThan(teknonymyPerson) || isOlderSameGeneration;
   }
 
   /**
