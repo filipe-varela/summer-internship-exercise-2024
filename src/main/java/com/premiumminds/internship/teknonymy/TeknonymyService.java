@@ -49,7 +49,7 @@ class TeknonymyService implements ITeknonymyService {
   String getRelativeTeknonymy(final Character sex, final int level) {
     if (level < 1)
       throw new IllegalArgumentException("The argument level = " + level + " must be greater than zero.");
-    if (sex != 'M' || sex != 'F')
+    if (sex != 'M' && sex != 'F')
       throw new IllegalArgumentException("The sex argument = " + sex + " must be either 'M' or 'F'.");
 
     String teknonymy = "";
