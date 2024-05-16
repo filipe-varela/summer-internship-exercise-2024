@@ -8,6 +8,26 @@ import com.premiumminds.internship.teknonymy.Person;
 class TeknonymyService implements ITeknonymyService {
 
   /**
+   * Method to get a Person Teknonymy Name
+   * 
+   * @param Person person
+   * @return String which is the Teknonymy Name
+   */
+  public String getTeknonymy(Person person) {
+    // In case the person doesn't havee children
+    if (!person.hasChildren())
+      return "";
+
+    // otherwise, retrieve teh teknonymy of the the current person
+    Character sex = person.sex();
+    Person finalChildren = getMostDistantChildren(person);
+    String name = finalChildren.name();
+    int level = finalChildren.generation();
+
+    return getRelativeTeknonymy(sex, level) + " of " + name;
+  };
+
+  /**
    * <p>
    * Get corresponding relative teknonymy given the sex and level in the family
    * tree. That is, if:
@@ -29,6 +49,9 @@ class TeknonymyService implements ITeknonymyService {
   String getRelativeTeknonymy(final Character sex, final int level) {
     if (level < 1)
       throw new IllegalArgumentException("The argument level = " + level + " must be greater than zero.");
+    if (sex != 'M' || sex != 'F')
+      throw new IllegalArgumentException("The sex argument = " + sex + " must be either 'M' or 'F'.");
+
     String teknonymy = "";
     if (level > 1) {
       teknonymy = "grand";
@@ -38,64 +61,63 @@ class TeknonymyService implements ITeknonymyService {
     return (sex == 'M') ? teknonymy + "father" : teknonymy + "mother";
   }
 
-  Person getRecentOldestChildren(final Person root) {
+  /**
+   * Retrieve the most distant descendent from the root person. It evaluates
+   * each level (horizontally) of the family tree as to find the oldest person
+   * of the most recent generation.
+   * 
+   * @param root Where the search begins. It's assumed the root has children.
+   * @return The most distant descendent from root.
+   */
+  Person getMostDistantChildren(final Person root) {
     final List<Person> personQueue = new ArrayList<Person>();
+
+    // Adds root to the queue and set its family tree level to 0 as it's the
+    // base, and increments its children afterwards.
     personQueue.add(root.withLevel(0));
+    personQueue.get(0).incrementChildrenGeneration();
 
-    personQueue.get(0).incrementChildrenLevel();
-
-    Person teknonymyPerson = new Person(personQueue.get(0));
+    Person distantDescendent = new Person(personQueue.get(0));
     Person currentPerson = new Person(personQueue.get(0));
 
     while (!personQueue.isEmpty()) {
       currentPerson = personQueue.remove(0);
 
-      // validate oldest and recent children
-      if (!currentPerson.equals(teknonymyPerson) &&
-          doesUpdateTeknonymyPerson(teknonymyPerson, currentPerson)) {
-        teknonymyPerson = new Person(currentPerson);
+      if (doesUpdateTeknonymyPerson(distantDescendent, currentPerson)) {
+        distantDescendent = new Person(currentPerson);
       }
 
       if (!currentPerson.hasChildren())
         continue;
 
       for (Person person : currentPerson.children()) {
-        if (person.hasChildren()) {
-          // Update children level, if any
-          person.incrementChildrenLevel();
-        }
+        // Update children level, if any
+        if (person.hasChildren())
+          person.incrementChildrenGeneration();
 
-        // Add to queue since it has children
         personQueue.add(0, person);
       }
     }
 
-    return teknonymyPerson;
+    return distantDescendent;
 
-  }
-
-  private boolean doesUpdateTeknonymyPerson(Person teknonymyPerson, Person currentPerson) {
-    boolean isOlderSameGeneration = currentPerson.isSameGenerationAs(teknonymyPerson)
-        && currentPerson.isOlderThan(teknonymyPerson);
-    return currentPerson.isMoreRecentThan(teknonymyPerson) || isOlderSameGeneration;
   }
 
   /**
-   * Method to get a Person Teknonymy Name
+   * Evaluates if the target's person should be updated with the current person.
+   * This evaluation is done by checking if target is more distant or, in the
+   * same generation, older than the current one.
    * 
-   * @param Person person
-   * @return String which is the Teknonymy Name
+   * @param target  Person to evaluate
+   * @param current Current person to compare from
+   * @return true in case target is more distant/older than the current
    */
-  public String getTeknonymy(Person person) {
-    // In case the person doesn't havee children
-    if (!person.hasChildren())
-      return "";
+  private boolean doesUpdateTeknonymyPerson(Person target, Person current) {
+    boolean isOlderSameGeneration = current.isSameGenerationAs(target) &&
+        current.isOlderThan(target);
 
-    Character sex = person.sex();
-    Person finalChildren = getRecentOldestChildren(person);
-    String name = finalChildren.name();
-    int level = finalChildren.level();
-
-    return getRelativeTeknonymy(sex, level) + " of " + name;
-  };
+    return !current.equals(target) &&
+        current.isNewerGenerationThan(target) ||
+        isOlderSameGeneration;
+  }
 }
