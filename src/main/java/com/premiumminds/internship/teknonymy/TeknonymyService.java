@@ -38,11 +38,6 @@ class TeknonymyService implements ITeknonymyService {
     return (sex == 'M') ? teknonymy + "father" : teknonymy + "mother";
   }
 
-  private boolean doesNotHaveChildren(Person person) {
-    final Person[] children = person.children();
-    return children == null || children.length == 0;
-  }
-
   Person getRecentOldestChildren(final Person root) {
     final List<Person> personQueue = new ArrayList<Person>();
     personQueue.add(root.withLevel(0));
@@ -66,11 +61,11 @@ class TeknonymyService implements ITeknonymyService {
         }
       }
 
-      if (doesNotHaveChildren(currentPerson))
+      if (!currentPerson.hasChildren())
         continue;
 
       for (Person person : currentPerson.children()) {
-        if (!doesNotHaveChildren(person)) {
+        if (person.hasChildren()) {
           // Update children level, if any
           person.incrementChildrenLevel();
         }
@@ -92,7 +87,7 @@ class TeknonymyService implements ITeknonymyService {
    */
   public String getTeknonymy(Person person) {
     // In case the person doesn't havee children
-    if (doesNotHaveChildren(person))
+    if (!person.hasChildren())
       return "";
 
     Character sex = person.sex();

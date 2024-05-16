@@ -47,4 +47,8 @@ public record Person(
             children[i] = children[i].withLevel(level + 1);
         }
     }
+
+    public boolean hasChildren() {
+        return children != null && children.length > 0;
+    }
 }
