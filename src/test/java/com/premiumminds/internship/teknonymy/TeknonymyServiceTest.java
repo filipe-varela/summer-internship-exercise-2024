@@ -36,7 +36,7 @@ public class TeknonymyServiceTest {
   }
 
   @Test
-  public void PersonNoChildren2Test() {
+  public void PersonNoChildrenNotNullTest() {
     Person person = new Person("John", 'M', new Person[] {}, LocalDateTime.of(1046, 1, 1, 0, 0));
     String result = new TeknonymyService().getTeknonymy(person);
     String expected = "";
@@ -52,6 +52,265 @@ public class TeknonymyServiceTest {
         LocalDateTime.of(1046, 1, 1, 0, 0));
     String result = new TeknonymyService().getTeknonymy(person);
     String expected = "father of Holy";
+    assertEquals(result, expected);
+  }
+
+  @Test
+  public void PersonTwoChildYoungestTest() {
+    Person person = new Person(
+        "John",
+        'M',
+        new Person[] {
+            new Person("Holy", 'F', null, LocalDateTime.of(1046, 1, 1, 0, 0)),
+            new Person("Baxter", 'M', null, LocalDateTime.of(1050, 1, 1, 0, 0))
+        },
+        LocalDateTime.of(1046, 1, 1, 0, 0));
+    String result = new TeknonymyService().getTeknonymy(person);
+    String expected = "father of Holy";
+    assertEquals(result, expected);
+  }
+
+  @Test
+  public void PersonTwoChildOldestTest() {
+    Person person = new Person(
+        "John",
+        'M',
+        new Person[] {
+            new Person("Holy", 'F', null, LocalDateTime.of(1046, 1, 1, 0, 0)),
+            new Person("Baxter", 'M', null, LocalDateTime.of(1044, 1, 1, 0, 0))
+        },
+        LocalDateTime.of(1044, 1, 1, 0, 0));
+    String result = new TeknonymyService().getTeknonymy(person);
+    String expected = "father of Baxter";
+    assertEquals(result, expected);
+  }
+
+  @Test
+  public void PersonTwoChildAndOneGrandChildTest() {
+    Person person = new Person(
+        "John",
+        'M',
+        new Person[] {
+            new Person("Holy", 'F', new Person[] {
+                new Person("William", 'M', null, LocalDateTime.of(1066, 1, 1, 0, 0))
+            }, LocalDateTime.of(1046, 1, 1, 0, 0)),
+            new Person("Baxter", 'M', null, LocalDateTime.of(1044, 1, 1, 0, 0))
+        },
+        LocalDateTime.of(1044, 1, 1, 0, 0));
+    String result = new TeknonymyService().getTeknonymy(person);
+    String expected = "grandfather of William";
+    assertEquals(result, expected);
+  }
+
+  @Test
+  public void PersonTwoChildAndTwoGrandChildTest() {
+    Person person = new Person(
+        "John",
+        'M',
+        new Person[] {
+            new Person("Holy", 'F', new Person[] {
+                new Person("William", 'M', null, LocalDateTime.of(1066, 1, 1, 0, 0)),
+                new Person("Vanessa", 'F', null, LocalDateTime.of(1068, 1, 1, 0, 0))
+            }, LocalDateTime.of(1046, 1, 1, 0, 0)),
+            new Person("Baxter", 'M', null, LocalDateTime.of(1044, 1, 1, 0, 0))
+        },
+        LocalDateTime.of(1044, 1, 1, 0, 0));
+    String result = new TeknonymyService().getTeknonymy(person);
+    String expected = "grandfather of William";
+    assertEquals(result, expected);
+  }
+
+  @Test
+  public void PersonThreeChildAndTwoGrandChildTest() {
+    Person person = new Person(
+        "John",
+        'M',
+        new Person[] {
+            new Person("Holy", 'F', new Person[] {
+                new Person("William", 'M', null, LocalDateTime.of(1066, 1, 1, 0, 0)),
+                new Person("Vanessa", 'F', null, LocalDateTime.of(1068, 1, 1, 0, 0))
+            }, LocalDateTime.of(1046, 1, 1, 0, 0)),
+            new Person("Baxter", 'M', null, LocalDateTime.of(1044, 1, 1, 0, 0)),
+            new Person("Rebeca", 'F', null, LocalDateTime.of(1070, 1, 1, 0, 0))
+        },
+        LocalDateTime.of(1044, 1, 1, 0, 0));
+    String result = new TeknonymyService().getTeknonymy(person);
+    String expected = "grandfather of William";
+    assertEquals(result, expected);
+  }
+
+  @Test
+  public void PersonThreeChildAndTwoGrandChildAndOneGGChildTest() {
+    Person person = new Person(
+        "John",
+        'F',
+        new Person[] {
+            new Person("Holy", 'F', new Person[] {
+                new Person("William", 'M', null, LocalDateTime.of(1066, 1, 1, 0, 0)),
+                new Person("Vanessa", 'F', new Person[] {
+                    new Person("Mark", 'M', null, LocalDateTime.of(1071, 1, 1, 0, 0))
+                }, LocalDateTime.of(1068, 1, 1, 0, 0))
+            }, LocalDateTime.of(1046, 1, 1, 0, 0)),
+            new Person("Baxter", 'M', null, LocalDateTime.of(1044, 1, 1, 0, 0)),
+            new Person("Rebeca", 'F', null, LocalDateTime.of(1070, 1, 1, 0, 0))
+        },
+        LocalDateTime.of(1044, 1, 1, 0, 0));
+    String result = new TeknonymyService().getTeknonymy(person);
+    String expected = "great-grandmother of Mark";
+    assertEquals(result, expected);
+  }
+
+  @Test
+  public void DummyATest() {
+    Person person = new Person(
+        "A",
+        'M',
+        new Person[] {
+            new Person("B", 'M', new Person[] {
+                new Person("E", 'M', null, LocalDateTime.of(2019, 1, 1, 0, 0)),
+            }, LocalDateTime.of(1046, 1, 1, 0, 0)),
+            new Person("C", 'M', null, LocalDateTime.of(2002, 1, 1, 0, 0)),
+            new Person("D", 'F', new Person[] {
+                new Person("F", 'M', null, LocalDateTime.of(2018, 1, 1, 0, 0)),
+                new Person("G", 'M', null, LocalDateTime.of(2021, 1, 1, 0, 0)),
+                new Person("H", 'M', null, LocalDateTime.of(2022, 1, 1, 0, 0))
+            }, LocalDateTime.of(1070, 1, 1, 0, 0))
+        },
+        LocalDateTime.of(1980, 1, 1, 0, 0));
+    String result = new TeknonymyService().getTeknonymy(person);
+    String expected = "grandfather of F";
+    assertEquals(result, expected);
+  }
+
+  @Test
+  public void DummyBTest() {
+    Person person = new Person(
+        "A",
+        'M',
+        new Person[] {
+            new Person("B", 'M', new Person[] {
+                new Person("E", 'M', null, LocalDateTime.of(2019, 1, 1, 0, 0)),
+            }, LocalDateTime.of(1046, 1, 1, 0, 0)),
+            new Person("C", 'M', null, LocalDateTime.of(2002, 1, 1, 0, 0)),
+            new Person("D", 'F', new Person[] {
+                new Person("F", 'M', null, LocalDateTime.of(2018, 1, 1, 0, 0)),
+                new Person("G", 'M', null, LocalDateTime.of(2021, 1, 1, 0, 0)),
+                new Person("H", 'M', null, LocalDateTime.of(2022, 1, 1, 0, 0))
+            }, LocalDateTime.of(1070, 1, 1, 0, 0))
+        },
+        LocalDateTime.of(1980, 1, 1, 0, 0));
+    String result = new TeknonymyService().getTeknonymy(person.children()[0]);
+    String expected = "father of E";
+    assertEquals(result, expected);
+  }
+
+  @Test
+  public void DummyDTest() {
+    Person person = new Person(
+        "A",
+        'M',
+        new Person[] {
+            new Person("B", 'M', new Person[] {
+                new Person("E", 'M', null, LocalDateTime.of(2019, 1, 1, 0, 0)),
+            }, LocalDateTime.of(1046, 1, 1, 0, 0)),
+            new Person("C", 'M', null, LocalDateTime.of(2002, 1, 1, 0, 0)),
+            new Person("D", 'F', new Person[] {
+                new Person("F", 'M', null, LocalDateTime.of(2018, 1, 1, 0, 0)),
+                new Person("G", 'M', null, LocalDateTime.of(2021, 1, 1, 0, 0)),
+                new Person("H", 'M', null, LocalDateTime.of(2022, 1, 1, 0, 0))
+            }, LocalDateTime.of(1070, 1, 1, 0, 0))
+        },
+        LocalDateTime.of(1980, 1, 1, 0, 0));
+    String result = new TeknonymyService().getTeknonymy(person.children()[2]);
+    String expected = "mother of F";
+    assertEquals(result, expected);
+  }
+
+  @Test
+  public void DummyCTest() {
+    Person person = new Person(
+        "A",
+        'M',
+        new Person[] {
+            new Person("B", 'M', new Person[] {
+                new Person("E", 'M', null, LocalDateTime.of(2019, 1, 1, 0, 0)),
+            }, LocalDateTime.of(1046, 1, 1, 0, 0)),
+            new Person("C", 'M', null, LocalDateTime.of(2002, 1, 1, 0, 0)),
+            new Person("D", 'F', new Person[] {
+                new Person("F", 'M', null, LocalDateTime.of(2018, 1, 1, 0, 0)),
+                new Person("G", 'M', null, LocalDateTime.of(2021, 1, 1, 0, 0)),
+                new Person("H", 'M', null, LocalDateTime.of(2022, 1, 1, 0, 0))
+            }, LocalDateTime.of(1070, 1, 1, 0, 0))
+        },
+        LocalDateTime.of(1980, 1, 1, 0, 0));
+    String result = new TeknonymyService().getTeknonymy(person.children()[1]);
+    String expected = "";
+    assertEquals(result, expected);
+  }
+
+  @Test
+  public void DummyETest() {
+    Person person = new Person(
+        "A",
+        'M',
+        new Person[] {
+            new Person("B", 'M', new Person[] {
+                new Person("E", 'M', null, LocalDateTime.of(2019, 1, 1, 0, 0)),
+            }, LocalDateTime.of(1046, 1, 1, 0, 0)),
+            new Person("C", 'M', null, LocalDateTime.of(2002, 1, 1, 0, 0)),
+            new Person("D", 'F', new Person[] {
+                new Person("F", 'M', null, LocalDateTime.of(2018, 1, 1, 0, 0)),
+                new Person("G", 'M', null, LocalDateTime.of(2021, 1, 1, 0, 0)),
+                new Person("H", 'M', null, LocalDateTime.of(2022, 1, 1, 0, 0))
+            }, LocalDateTime.of(1070, 1, 1, 0, 0))
+        },
+        LocalDateTime.of(1980, 1, 1, 0, 0));
+    String result = new TeknonymyService().getTeknonymy(person.children()[0].children()[0]);
+    String expected = "";
+    assertEquals(result, expected);
+  }
+
+  @Test
+  public void DummyGTest() {
+    Person person = new Person(
+        "A",
+        'M',
+        new Person[] {
+            new Person("B", 'M', new Person[] {
+                new Person("E", 'M', null, LocalDateTime.of(2019, 1, 1, 0, 0)),
+            }, LocalDateTime.of(1046, 1, 1, 0, 0)),
+            new Person("C", 'M', null, LocalDateTime.of(2002, 1, 1, 0, 0)),
+            new Person("D", 'F', new Person[] {
+                new Person("F", 'M', null, LocalDateTime.of(2018, 1, 1, 0, 0)),
+                new Person("G", 'M', null, LocalDateTime.of(2021, 1, 1, 0, 0)),
+                new Person("H", 'M', null, LocalDateTime.of(2022, 1, 1, 0, 0))
+            }, LocalDateTime.of(1070, 1, 1, 0, 0))
+        },
+        LocalDateTime.of(1980, 1, 1, 0, 0));
+    String result = new TeknonymyService().getTeknonymy(person.children()[2].children()[1]);
+    String expected = "";
+    assertEquals(result, expected);
+  }
+
+  @Test
+  public void DummyHTest() {
+    Person person = new Person(
+        "A",
+        'M',
+        new Person[] {
+            new Person("B", 'M', new Person[] {
+                new Person("E", 'M', null, LocalDateTime.of(2019, 1, 1, 0, 0)),
+            }, LocalDateTime.of(1046, 1, 1, 0, 0)),
+            new Person("C", 'M', null, LocalDateTime.of(2002, 1, 1, 0, 0)),
+            new Person("D", 'F', new Person[] {
+                new Person("F", 'M', null, LocalDateTime.of(2018, 1, 1, 0, 0)),
+                new Person("G", 'M', null, LocalDateTime.of(2021, 1, 1, 0, 0)),
+                new Person("H", 'M', null, LocalDateTime.of(2022, 1, 1, 0, 0))
+            }, LocalDateTime.of(1070, 1, 1, 0, 0))
+        },
+        LocalDateTime.of(1980, 1, 1, 0, 0));
+    String result = new TeknonymyService().getTeknonymy(person.children()[2].children()[2]);
+    String expected = "";
     assertEquals(result, expected);
   }
 
@@ -109,6 +368,16 @@ public class TeknonymyServiceTest {
     String result = new TeknonymyService().getRelativeTeknonymy('F', 4);
     String expected = "great-great-grandmother";
     assertEquals(result, expected);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void ZeroLevelTest() {
+    new TeknonymyService().getRelativeTeknonymy('M', 0);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void NegativeLevelTest() {
+    new TeknonymyService().getRelativeTeknonymy('M', -1);
   }
 
 }
