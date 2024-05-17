@@ -1,7 +1,7 @@
 package com.premiumminds.internship.teknonymy;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 import com.premiumminds.internship.teknonymy.Person;
 
@@ -69,16 +69,17 @@ class TeknonymyService implements ITeknonymyService {
    * @param root Where the search begins. It's assumed the root has children.
    * @return The most distant descendent from root.
    */
-  Person getMostDistantChildren(final Person root) {
-    final List<Person> personQueue = new ArrayList<Person>();
+  private Person getMostDistantChild(final Person root) {
+    final Queue<Person> personQueue = new ArrayDeque<Person>();
 
     // Adds root to the queue and set its family tree level to 0 as it's the
     // base, and increments its children afterwards.
     personQueue.add(root.withLevel(0));
-    personQueue.get(0).incrementChildrenGeneration();
+    personQueue.peek().incrementChildrenGeneration();
 
-    Person distantDescendent = new Person(personQueue.get(0));
-    Person currentPerson = new Person(personQueue.get(0));
+    // Placeholders for evaluation and return
+    Person distantChild = root;
+    Person currentPerson = root;
 
     while (!personQueue.isEmpty()) {
       currentPerson = personQueue.remove(0);
@@ -95,11 +96,11 @@ class TeknonymyService implements ITeknonymyService {
         if (person.hasChildren())
           person.incrementChildrenGeneration();
 
-        personQueue.add(0, person);
+        personQueue.add(person);
       }
     }
 
-    return distantDescendent;
+    return distantChild;
 
   }
 
