@@ -8,11 +8,16 @@ public record Person(
         Person[] children,
         LocalDateTime dateOfBirth,
         int generation) {
-    public Person(String name, Character sex, Person[] children, LocalDateTime dateOfBirth) {
+
+    public Person(
+            String name,
+            Character sex,
+            Person[] children,
+            LocalDateTime dateOfBirth) {
         this(name, sex, children, dateOfBirth, 0);
     }
 
-    public Person(Person newPerson) {
+    public Person(final Person newPerson) {
         this(
                 newPerson.name(),
                 newPerson.sex(),
@@ -30,15 +35,15 @@ public record Person(
                 newLevel);
     }
 
-    public boolean isNewerGenerationThan(Person test) {
+    public boolean isNewerGenerationThan(final Person test) {
         return test.generation() < this.generation;
     }
 
-    public boolean isOlderThan(Person test) {
+    public boolean isOlderThan(final Person test) {
         return this.dateOfBirth.isBefore(test.dateOfBirth());
     }
 
-    public boolean isSameGenerationAs(Person test) {
+    public boolean isSameGenerationAs(final Person test) {
         return test.generation() == this.generation;
     }
 
