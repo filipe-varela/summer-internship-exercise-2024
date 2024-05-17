@@ -178,12 +178,16 @@ public class TeknonymyServiceTest {
             }, LocalDateTime.of(1046, 1, 1, 0, 0)),
             new Person("Baxter", 'M', null, LocalDateTime.of(1044, 1, 1, 0, 0)),
             new Person("Rebeca", 'F', new Person[] {
-                new Person("Valister", 'F', null, LocalDateTime.of(1080, 1, 1, 0, 0))
+                new Person("Valister", 'F', new Person[] {
+                    new Person("Dorothy", 'F', new Person[] {
+                        new Person("Madelyn", 'M', null, LocalDateTime.of(1084, 12, 31, 0, 0))
+                    }, LocalDateTime.of(1051, 1, 1, 0, 0))
+                }, LocalDateTime.of(1050, 1, 1, 0, 0))
             }, LocalDateTime.of(1070, 1, 1, 0, 0))
         },
         LocalDateTime.of(1044, 1, 1, 0, 0));
     String result = new TeknonymyService().getTeknonymy(person);
-    String expected = "great-great-grandmother of Keith";
+    String expected = "great-great-grandmother of Madelyn";
     assertEquals(result, expected);
   }
 
