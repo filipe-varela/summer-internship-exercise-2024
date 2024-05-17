@@ -26,13 +26,22 @@ public record Person(
                 newPerson.generation());
     }
 
-    public Person withLevel(int newLevel) {
+    public Person withGeneration(int newGeneration) {
         return new Person(
                 this.name,
                 this.sex,
                 this.children,
                 this.dateOfBirth,
-                newLevel);
+                newGeneration);
+    }
+
+    public Person withChildren(final Person[] newChildren) {
+        return new Person(
+                this.name,
+                this.sex,
+                newChildren,
+                this.dateOfBirth,
+                this.generation);
     }
 
     public boolean isNewerGenerationThan(final Person test) {
@@ -47,10 +56,18 @@ public record Person(
         return test.generation() == this.generation;
     }
 
-    public void incrementChildrenGeneration() {
-        for (int i = 0; i < children.length; i++) {
-            children[i] = children[i].withLevel(generation + 1);
-        }
+    public Person incrementChildrenGeneration() {
+        Person[] incrementedChildren = new Person[children.length];
+        for (int i = 0; i < children.length; i++)
+            incrementedChildren[i] = children[i].withGeneration(generation + 1);
+        return this.withChildren(incrementedChildren);
+    }
+
+    public Person incrementChildrenGenerationIfAny() {
+        if (this.hasChildren())
+            return this.incrementChildrenGeneration();
+        else
+            return new Person(this);
     }
 
     public boolean hasChildren() {

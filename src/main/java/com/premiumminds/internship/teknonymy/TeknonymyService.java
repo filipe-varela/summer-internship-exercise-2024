@@ -77,8 +77,9 @@ class TeknonymyService implements ITeknonymyService {
 
     // Adds root to the queue and set its family tree level to 0 as it's the
     // base, and increments its children afterwards.
-    personQueue.add(root.withLevel(0));
-    personQueue.peek().incrementChildrenGeneration();
+    personQueue.add(root
+        .withGeneration(0)
+        .incrementChildrenGeneration());
 
     // Placeholders for evaluation and return
     Person distantChild = root;
@@ -93,13 +94,9 @@ class TeknonymyService implements ITeknonymyService {
       if (!currentPerson.hasChildren())
         continue;
 
-      for (Person person : currentPerson.children()) {
-        // Update children level, if any
-        if (person.hasChildren())
-          person.incrementChildrenGeneration();
-
-        personQueue.add(person);
-      }
+      // Queues next generation and update its children generation, if any
+      for (Person person : currentPerson.children())
+        personQueue.add(person.incrementChildrenGenerationIfAny());
     }
 
     return distantChild;
