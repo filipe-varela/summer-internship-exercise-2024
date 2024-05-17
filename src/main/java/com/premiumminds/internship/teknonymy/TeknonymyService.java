@@ -20,9 +20,9 @@ class TeknonymyService implements ITeknonymyService {
 
     // otherwise, retrieve teh teknonymy of the the current person
     Character sex = person.sex();
-    Person finalChildren = getMostDistantChildren(person);
-    String name = finalChildren.name();
-    int level = finalChildren.generation();
+    Person distantChild = getMostDistantChild(person);
+    String name = distantChild.name();
+    int level = distantChild.generation();
 
     return getRelativeTeknonymy(sex, level) + " of " + name;
   };
@@ -46,11 +46,14 @@ class TeknonymyService implements ITeknonymyService {
    * @param level integer value for the current family tree level
    * @return String with the corresponding relative teknonymy
    */
-  String getRelativeTeknonymy(final Character sex, final int level) {
+  public String getRelativeTeknonymy(final Character sex, final int level) {
     if (level < 1)
-      throw new IllegalArgumentException("The argument level = " + level + " must be greater than zero.");
+      throw new IllegalArgumentException(
+          "The argument level = " + level + " must be greater than zero.");
+
     if (sex != 'M' && sex != 'F')
-      throw new IllegalArgumentException("The sex argument = " + sex + " must be either 'M' or 'F'.");
+      throw new IllegalArgumentException(
+          "The sex argument = " + sex + " must be either 'M' or 'F'.");
 
     String teknonymy = "";
     if (level > 1) {
@@ -82,11 +85,10 @@ class TeknonymyService implements ITeknonymyService {
     Person currentPerson = root;
 
     while (!personQueue.isEmpty()) {
-      currentPerson = personQueue.remove(0);
+      currentPerson = personQueue.remove();
 
-      if (doesUpdateTeknonymyPerson(distantDescendent, currentPerson)) {
-        distantDescendent = new Person(currentPerson);
-      }
+      if (updatesDistantChild(distantChild, currentPerson))
+        distantChild = currentPerson;
 
       if (!currentPerson.hasChildren())
         continue;
@@ -113,7 +115,9 @@ class TeknonymyService implements ITeknonymyService {
    * @param current Current person to compare from
    * @return true in case target is more distant/older than the current
    */
-  private boolean doesUpdateTeknonymyPerson(Person target, Person current) {
+  private boolean updatesDistantChild(
+      final Person target,
+      final Person current) {
     boolean isOlderSameGeneration = current.isSameGenerationAs(target) &&
         current.isOlderThan(target);
 
